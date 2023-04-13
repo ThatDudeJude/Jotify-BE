@@ -11,7 +11,7 @@ from .managers import CustomUserManager
 # Create your models here.
 
 
-class CustomUserModel(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=15, unique=False, null=False, blank=False)
     email = models.EmailField(
         _("email address"),

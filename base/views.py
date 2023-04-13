@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
-from .models import CustomUserModel
+from .models import CustomUser
 
 # Create your views here.
 @api_view(["POST"])
@@ -14,7 +14,7 @@ from .models import CustomUserModel
 def signup(request):
     try:
         request_data = JSONParser().parse(request)
-        user = CustomUserModel.objects.create_user(
+        user = CustomUser.objects.create_user(
             email=request_data["email"],
             password=request_data["password"],
             name=request_data["name"],
@@ -44,6 +44,7 @@ def login_user(request):
             token = Token.objects.get(user=user)
         except:
             token, created = Token.objects.get_or_create(user=user)
+        print({"token": str(token)})
         return JsonResponse({"token": str(token)}, status=201)
 
 

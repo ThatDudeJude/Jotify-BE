@@ -8,15 +8,15 @@ from rest_framework.authtoken.models import Token
 # Create your tests here.
 
 
-class TestCustomUserModel(TestCase):
+class TestCustomUser(TestCase):
     def test_create_user(self):
-        CustomUserModel = get_user_model()
-        user = CustomUserModel.objects.create_user(
+        CustomUser = get_user_model()
+        user = CustomUser.objects.create_user(
             email="user@example.com", name="userexample", password="1234567890"
         )
         user.save()
-        self.assertEqual(CustomUserModel.objects.count(), 1)
-        check_user = CustomUserModel.objects.get(email="user@example.com")
+        self.assertEqual(CustomUser.objects.count(), 1)
+        check_user = CustomUser.objects.get(email="user@example.com")
         self.assertEqual(check_user.name, "userexample")
         self.assertTrue(check_user.is_active)
         self.assertFalse(check_user.is_staff)
@@ -27,17 +27,17 @@ class TestCustomUserModel(TestCase):
         except AttributeError:
             pass
         with self.assertRaises(TypeError):
-            CustomUserModel.objects.create_user()
+            CustomUser.objects.create_user()
         with self.assertRaises(TypeError):
-            CustomUserModel.objects.create_user(email="")
+            CustomUser.objects.create_user(email="")
         with self.assertRaises(ValueError):
-            CustomUserModel.objects.create_user(
+            CustomUser.objects.create_user(
                 email="", password="12343423", name="testfakeuser"
             )
 
     def test_create_superuser(self):
-        CustomUserModel = get_user_model()
-        superuser = CustomUserModel.objects.create_superuser(
+        CustomUser = get_user_model()
+        superuser = CustomUser.objects.create_superuser(
             email="superuser@example.com", name="su", password="123456789"
         )
         self.assertEqual(superuser.email, "superuser@example.com")
@@ -51,7 +51,7 @@ class TestCustomUserModel(TestCase):
             pass
 
         with self.assertRaises(ValueError):
-            CustomUserModel.objects.create_superuser(
+            CustomUser.objects.create_superuser(
                 email="su@example.com",
                 name="superuser",
                 password="1324354343",
