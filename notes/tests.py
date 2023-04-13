@@ -34,7 +34,6 @@ class QuickNotesTests(APITestCase):
             format="json",
         )
         cls.token = Token.objects.get(user=cls.test_author).key
-        # cls.client.credentials(HTTP_AUTHORIZATION=f"Token {cls.token}")
 
     def test_quick_note(self):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
@@ -154,17 +153,19 @@ class CategorizedNotesTests(APITestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(json.loads(response.content)["id"], self.categorized_note.id)
         self.assertEqual(
-            json.loads(response.content)["note_category"],
+            json.loads(response.content)[0]["id"], self.categorized_note.id
+        )
+        self.assertEqual(
+            json.loads(response.content)[0]["note_category"],
             self.categorized_note.note_category.category,
         )
         self.assertEqual(
-            json.loads(response.content)["note_title"],
+            json.loads(response.content)[0]["note_title"],
             self.categorized_note.note_title,
         )
         self.assertEqual(
-            json.loads(response.content)["note_body"],
+            json.loads(response.content)[0]["note_body"],
             self.categorized_note.note_body,
         )
 
