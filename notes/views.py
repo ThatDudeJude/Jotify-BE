@@ -117,13 +117,12 @@ def notes_list(request, category=None, category_id=None):
 def create_note(request):
     token = Token.objects.get(user=request.user)
     if request.auth.key == token.key:
-        try:
-            author = CustomUser.objects.get(email=request.user.email)
-        except ObjectDoesNotExist:
-            return Response(
-                {"message": "Unauthorized access"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        author = CustomUser.objects.get(email=request.user.email)
+    else:
+        return Response(
+            {"message": "Unauthorized access"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
     available_note_types = [note_type.category for note_type in NoteType.objects.all()][
         1:
     ]
@@ -168,7 +167,7 @@ def quick_note_detail(request, pk=None):
         except ObjectDoesNotExist:
             return Response(
                 {"message": "User's quick note not found "},
-                status=status.HTTP_401_UNAUTHORIZED,
+                status=status.HTTP_404_NOT_FOUND,
             )
     else:
         return Response(
@@ -207,7 +206,7 @@ def categorized_note_detail(request, pk):
         except ObjectDoesNotExist:
             return Response(
                 {"message": "User's categorized note not found"},
-                status=status.HTTP_401_UNAUTHORIZED,
+                status=status.HTTP_404_NOT_FOUND,
             )
     else:
         return Response(

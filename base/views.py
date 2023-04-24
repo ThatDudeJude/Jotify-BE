@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import permissions
+from .token_handlers import get_token_on_login
 from .models import CustomUser
 
 # Create your views here.
@@ -40,10 +41,7 @@ def login_user(request):
             status=400,
         )
     else:
-        try:
-            token = Token.objects.get(user=user)
-        except:
-            token, created = Token.objects.get_or_create(user=user)
+        token = get_token_on_login(user)
         print({"token": str(token)})
         return JsonResponse({"token": str(token)}, status=201)
 
