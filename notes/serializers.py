@@ -27,7 +27,10 @@ class CategorizedNotesSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation["note_category"] = instance.note_category.category
+        representation["note_category"] = {
+            "id": instance.note_category.id,
+            "name": instance.note_category.category,
+        }
         return representation
 
     def create(self, validated_data):
@@ -52,7 +55,9 @@ class QuickNotesSerializer(serializers.ModelSerializer):
         ]
 
     def get_note_category(self, note):
-        return NoteTypeSerializer(note.note_category).data["category"]
+        id = NoteTypeSerializer(note.note_category).data["id"]
+        name = NoteTypeSerializer(note.note_category).data["category"]
+        return {"id": id, "name": name}
 
 
 class AuthorNotesSerializer(serializers.ModelSerializer):

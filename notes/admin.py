@@ -59,4 +59,4 @@ class CategorizedNoteAdmin(admin.ModelAdmin):
 
 @admin.register(NoteType)
 class NoteTypeAdmin(admin.ModelAdmin):
-    list_display = ["category"]
+    list_display = ["id", "category"]

@@ -87,7 +87,7 @@ def notes_list(request, category=None, category_id=None):
             print(f"category: {category}")
             serializer = AuthorNotesSerializer(author)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        elif category == "quicknotes":
+        elif category == "quick":
             serializer = QuickNotesSerializer(
                 author.author_notes_quicknote.all(), many=True
             )
@@ -123,24 +123,22 @@ def create_note(request):
             {"message": "Unauthorized access"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
-    available_note_types = [note_type.category for note_type in NoteType.objects.all()][
+    user_categorized_note_types = [note_type.id for note_type in NoteType.objects.all()][
         1:
     ]
 
     serializer_is_set = False
-    if request.data["note_category"] == "Quick Note":
+    if request.data["note_category"] == 1:
         serializer = QuickNotesSerializer(
             data=request.data, context={"request": request}
         )
         serializer_is_set = True
-    elif request.data["note_category"] in available_note_types:
+    elif request.data["note_category"] in user_categorized_note_types:
         # Debug note
         # To remove after building ui as id will be provided by default in the request
 
         data = json.dumps(request.data)
-        data = json.loads(data)
-        category_id = NoteType.objects.get(category=data["note_category"]).id
-        data["note_category"] = category_id
+        data = json.loads(data)        
         print("category:", data["note_category"])
         serializer = CategorizedNotesSerializer(data=data, context={"request": request})
         serializer_is_set = True
@@ -180,11 +178,22 @@ def quick_note_detail(request, pk=None):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == "PUT":
-        serializer = QuickNotesSerializer(
-            note, data=request.data, context={"request": request}
-        )
+        data = json.dumps(request.data)
+        data = json.loads(data)
+        # category = NoteType.objects.get(category=data["note_category"])
+        # data["note_category"] = category.id
+        if not data["note_category"] == 1:
+            serializer = CategorizedNotesSerializer(
+                data=data, context={"request": request}
+            )
+        else:
+            serializer = QuickNotesSerializer(
+                note, data=request.data, context={"request": request}
+            )
         if serializer.is_valid():
             serializer.save()
+            if not note.note_category.id == data["note_category"]:
+                note.delete()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -220,14 +229,23 @@ def categorized_note_detail(request, pk):
 
     elif request.method == "PUT":
         data = json.dumps(request.data)
-        data = json.loads(data)
-        category_id = NoteType.objects.get(category=data["note_category"]).id
-        data["note_category"] = category_id
-        serializer = CategorizedNotesSerializer(
-            note, data=data, context={"request": request}
-        )
+        data = json.loads(data)        
+        if data["note_category"] == 1:
+            serializer = QuickNotesSerializer(
+                data=request.data, context={"request": request}
+            )
+        elif not note.note_category.id == data["note_category"]:
+            serializer = CategorizedNotesSerializer(
+                data=data, context={"request": request}
+            )
+        else:
+            serializer = CategorizedNotesSerializer(
+                note, data=data, context={"request": request}
+            )
         if serializer.is_valid():
             serializer.save()
+            if not note.note_category.id == data["note_category"]:
+                note.delete()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -43,7 +43,7 @@ def login_user(request):
     else:
         token = get_token_on_login(user)
         print({"token": str(token)})
-        return JsonResponse({"token": str(token)}, status=201)
+        return JsonResponse({"token": str(token), "name": user.name}, status=201)
 
 
 @api_view(["GET"])
