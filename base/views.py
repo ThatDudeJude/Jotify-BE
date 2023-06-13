@@ -24,7 +24,7 @@ def signup(request):
         token = Token.objects.get(user=user)
         return JsonResponse({"token": str(token)}, status=201)
     except IntegrityError as e:
-        return JsonResponse({"error": "Email used already exists"}, status=400)
+        return JsonResponse({"error": "Email already exists!"}, status=400)
 
 
 @api_view(["POST"])
