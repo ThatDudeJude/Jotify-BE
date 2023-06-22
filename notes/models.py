@@ -25,6 +25,7 @@ class Note(models.Model):
 
 class NoteType(models.Model):
     category = models.CharField(max_length=25, blank=False)
+    creator_id = models.IntegerField(blank=False, null=False, default=0)
 
     @classmethod
     def get_default_category_pk(cls):

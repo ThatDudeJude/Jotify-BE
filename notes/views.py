@@ -15,6 +15,7 @@ from .serializers import (
     QuickNotesSerializer,
     CategorizedNotesSerializer,
     AuthorNoteCategoriesSerializer,
+    AuthorNoteTypesSerializer,
     NoteTypeSerializer,
 )
 
@@ -38,6 +39,22 @@ def author_note_categories_list(request):
         return Response(serializers.data, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+@permission_classes([permissions.IsAuthenticated])
+def user_note_types(request, pk=None):
+    token = Token.objects.get(user=request.user)
+    if request.auth.key == token.key:
+        user = CustomUser.objects.get(email=request.user.email)
+    else:
+        return Response(
+            {"message": "Unauthorized access attempted! Please log in."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+    if request.method == "GET":
+        serializers = AuthorNoteTypesSerializer(user)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+
+
 @api_view(["POST", "DELETE"])
 @permission_classes([permissions.IsAuthenticated])
 def note_categories_detail(request, pk=None):
@@ -51,22 +68,31 @@ def note_categories_detail(request, pk=None):
         )
 
     if request.method == "POST":
-        serializer = NoteTypeSerializer(data=request.data)
+        data = json.dumps(request.data)
+        data = json.loads(data)
+        data["creator_id"] = request.user.id
+        serializer = NoteTypeSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == "DELETE":
-        try:
-            note_type = NoteType.objects.get(id=pk)
-            note_type.delete()
+        if not id == 1:
+            try:
+                note_type = NoteType.objects.get(id=pk)
+                note_type.delete()
+                return Response(
+                    {"message": "Category delete successful"}, status=status.HTTP_200_OK
+                )
+            except ObjectDoesNotExist:
+                return Response(
+                    {"message": "Note category not found"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
             return Response(
-                {"message": "Category delete successful"}, status=status.HTTP_200_OK
-            )
-        except ObjectDoesNotExist:
-            return Response(
-                {"message": "Note category not found"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"message": "Note category 'Quick Note' cannot be deleted."},
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
 
@@ -123,9 +149,9 @@ def create_note(request):
             {"message": "Unauthorized access"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
-    user_categorized_note_types = [note_type.id for note_type in NoteType.objects.all()][
-        1:
-    ]
+    user_categorized_note_types = [
+        note_type.id for note_type in NoteType.objects.all()
+    ][1:]
 
     serializer_is_set = False
     if request.data["note_category"] == 1:
@@ -138,7 +164,7 @@ def create_note(request):
         # To remove after building ui as id will be provided by default in the request
 
         data = json.dumps(request.data)
-        data = json.loads(data)        
+        data = json.loads(data)
         print("category:", data["note_category"])
         serializer = CategorizedNotesSerializer(data=data, context={"request": request})
         serializer_is_set = True
@@ -229,7 +255,7 @@ def categorized_note_detail(request, pk):
 
     elif request.method == "PUT":
         data = json.dumps(request.data)
-        data = json.loads(data)        
+        data = json.loads(data)
         if data["note_category"] == 1:
             serializer = QuickNotesSerializer(
                 data=request.data, context={"request": request}

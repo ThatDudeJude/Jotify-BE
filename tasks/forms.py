@@ -12,5 +12,5 @@ class CreateTaskForm(ModelForm):
             "due_date",
             "due_time",
             "task_completed",
-            "is_priority",
+            "task_priority",
         ]

@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
+
+env = Env()
+env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2y&h03n)-t!dm(#ak6a1ip)idbje#3qggo!sd=o+i1*m4f89al"
+SECRET_KEY = env.str("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [env.str("HOSTNAME1"), "127.0.0.1"]
 
 
 # Application definition
@@ -143,10 +148,14 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = ("http://localhost:3000",)
+CORS_ALLOWED_ORIGINS = (
+    env.str("LOCALHOST"),
+    env.str("NETWORKHOST"),
+)
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000/",
+    env.str("LOCALHOST"),
+    env.str("NETWORKHOST"),
 ]
 
 TOKEN_EXPIRY_DELAY = 24 * 60 * 60

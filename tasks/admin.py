@@ -14,7 +14,7 @@ class TaskAdmin(admin.ModelAdmin):
         "due_date",
         # "due_time",
     ]
-    list_filter = ("task_scheduler", "is_priority")
+    list_filter = ("task_scheduler", "task_priority")
 
     fieldsets = (
         (
@@ -26,7 +26,7 @@ class TaskAdmin(admin.ModelAdmin):
                     "due_date",
                     "due_time",
                     "task_completed",
-                    "is_priority",
+                    "task_priority",
                     "task_scheduler",
                 ),
             },

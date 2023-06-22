@@ -3,6 +3,12 @@ from notes.models import CustomUser
 
 # Create your models here.
 
+TASK_PRIORITY_CHOICES = (
+    ("LOW", "low"),
+    ("MEDIUM", "medium"),
+    ("HIGH", "high"),
+)
+
 
 class Task(models.Model):
     scheduler = models.ForeignKey(
@@ -20,7 +26,14 @@ class Task(models.Model):
     due_date = models.DateField(blank=False, null=False, name="due_date")
     due_time = models.TimeField(blank=False, null=False, name="due_time")
     done = models.BooleanField(default=False, name="task_completed")
-    is_priority = models.BooleanField(default=False, name="is_priority")
+    task_priority = models.CharField(
+        max_length=6,
+        choices=TASK_PRIORITY_CHOICES,
+        null=False,
+        blank=False,
+        default="low",
+        name="task_priority",
+    )
 
     class Meta:
         ordering = ["-due_date", "-due_time"]

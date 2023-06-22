@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from .models import CategorizedNote, QuickNote, NoteType
 from base.models import CustomUser
 from operator import itemgetter
@@ -8,7 +9,7 @@ from itertools import chain
 class NoteTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoteType
-        fields = ["category"]
+        fields = ["id", "category", "creator_id"]
 
 
 class CategorizedNotesSerializer(serializers.ModelSerializer):
@@ -32,11 +33,6 @@ class CategorizedNotesSerializer(serializers.ModelSerializer):
             "name": instance.note_category.category,
         }
         return representation
-
-    def create(self, validated_data):
-
-        print(f"validated {validated_data}")
-        return super().create(validated_data)
 
 
 class QuickNotesSerializer(serializers.ModelSerializer):
@@ -92,7 +88,12 @@ class AuthorNoteCategoriesSerializer(serializers.ModelSerializer):
         fields = ["all_user_categories"]
 
     def get_all_user_categories(self, user):
-        categories_list = []
+        categories_list = [
+            {
+                "id": NoteType.get_default_category_pk(),
+                "category": NoteType.objects.first().category,
+            }
+        ]
         for note in user.author_notes_categorizednote.all():
             categories_list.append(
                 {"category": note.note_category.category, "id": note.note_category.id}
@@ -102,6 +103,33 @@ class AuthorNoteCategoriesSerializer(serializers.ModelSerializer):
                 {"category": note.note_category.category, "id": note.note_category.id}
             )
         return list({n["id"]: n for n in categories_list}.values())
+
+
+class AuthorNoteTypesSerializer(serializers.ModelSerializer):
+    all_user_note_types = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ["all_user_note_types"]
+
+    def get_all_user_note_types(self, user):
+        categories_list = [
+            {
+                "id": NoteType.get_default_category_pk(),
+                "category": NoteType.objects.first().category,
+            }
+        ]
+
+        try:
+            user_note_types = NoteType.objects.filter(creator_id=int(user.id))
+            for note_category in user_note_types:
+                categories_list.append(
+                    {"id": note_category.id, "category": note_category.category}
+                )
+        except ObjectDoesNotExist:
+            pass
+
+        return categories_list
 
 
 class NoteTypeSerializer(serializers.ModelSerializer):
