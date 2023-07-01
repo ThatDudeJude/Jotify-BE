@@ -72,6 +72,7 @@ class TaskDetail(APIView):
         serializer = TasksSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @permission_classes([permissions.IsAuthenticated])
     def put(self, request, pk, format=None):
         scheduler = self.get_scheduler(request)
         task = self.get_task(pk, scheduler)
@@ -83,6 +84,7 @@ class TaskDetail(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @permission_classes([permissions.IsAuthenticated])
     def delete(self, request, pk, format=None):
         scheduler = self.get_scheduler(request)
         task = self.get_task(pk, scheduler)

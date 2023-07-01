@@ -4,9 +4,9 @@ from notes.models import CustomUser
 # Create your models here.
 
 TASK_PRIORITY_CHOICES = (
-    ("LOW", "low"),
-    ("MEDIUM", "medium"),
-    ("HIGH", "high"),
+    ("LOW", "Low"),
+    ("MEDIUM", "Medium"),
+    ("HIGH", "High"),
 )
 
 
@@ -31,7 +31,7 @@ class Task(models.Model):
         choices=TASK_PRIORITY_CHOICES,
         null=False,
         blank=False,
-        default="low",
+        default="LOW",
         name="task_priority",
     )
 
