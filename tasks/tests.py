@@ -67,7 +67,7 @@ class TaskTests(APITestCase):
                 "due_date": "2023-04-14",
                 "due_time": "20:30:00",
                 "task_completed": False,
-                "is_priority": True,
+                "task_priority": "Low",
             },
             format="json",
         )
@@ -84,7 +84,7 @@ class TaskTests(APITestCase):
         self.assertEqual(json.loads(response.content)["due_date"], "2023-04-14")
         self.assertEqual(json.loads(response.content)["due_time"], "20:30:00")
         self.assertFalse(json.loads(response.content)["task_completed"])
-        self.assertTrue(json.loads(response.content)["is_priority"])
+        self.assertEqual(json.loads(response.content)["task_priority"], "Low")
 
     def test_update_task(self):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
@@ -96,7 +96,7 @@ class TaskTests(APITestCase):
                 "due_date": "2023-04-15",
                 "due_time": "21:30:00",
                 "task_completed": True,
-                "is_priority": True,
+                "task_priority": "High",
             },
             format="json",
         )
@@ -114,4 +114,4 @@ class TaskTests(APITestCase):
         self.assertEqual(json.loads(response.content)["due_date"], "2023-04-15")
         self.assertEqual(json.loads(response.content)["due_time"], "21:30:00")
         self.assertTrue(json.loads(response.content)["task_completed"])
-        self.assertTrue(json.loads(response.content)["is_priority"])
+        self.assertEqual(json.loads(response.content)["task_priority"], "High")

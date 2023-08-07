@@ -48,5 +48,4 @@ urlpatterns = [
         categorized_note_detail,
         name="categorized_note_delete",
     ),
-    # path("categorized-note/<int:pk>/", get_categorized_note, name="categorized_note"),
 ]

@@ -38,12 +38,12 @@ class QuickNotesTests(APITestCase):
     def test_quick_note(self):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
         response = self.client.get(
-            reverse("all_quicknotes", kwargs={"category": "quicknotes"}), format="json"
+            reverse("all_quicknotes", kwargs={"category": "quick"}), format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(json.loads(response.content)[0]["id"], self.quicknote.id)
         self.assertEqual(
-            json.loads(response.content)[0]["note_category"],
+            json.loads(response.content)[0]["note_category"]["name"],
             self.quicknote.note_category.category,
         )
         self.assertEqual(
@@ -61,7 +61,7 @@ class QuickNotesTests(APITestCase):
         response = self.client.post(
             url,
             {
-                "note_category": "Quick Note",
+                "note_category": 1,
                 "note_title": "Another Test Quick Note",
                 "note_body": "Just another test quick note!",
             },
@@ -74,7 +74,7 @@ class QuickNotesTests(APITestCase):
         )
         self.assertEqual(json.loads(response.content)["id"], 2)
         self.assertEqual(
-            json.loads(response.content)["note_category"],
+            json.loads(response.content)["note_category"]["name"],
             "Quick Note",
         )
         self.assertEqual(
@@ -91,6 +91,7 @@ class QuickNotesTests(APITestCase):
         response = self.client.put(
             url,
             {
+                "note_category": 1,
                 "note_title": "First Test Quick Note (updated)",
                 "note_body": "First userexample test quick note updated",
             },
@@ -103,7 +104,7 @@ class QuickNotesTests(APITestCase):
         )
         self.assertEqual(json.loads(response.content)["id"], 1)
         self.assertEqual(
-            json.loads(response.content)["note_category"],
+            json.loads(response.content)["note_category"]["name"],
             "Quick Note",
         )
         self.assertEqual(
@@ -124,6 +125,7 @@ class CategorizedNotesTests(APITestCase):
             email="user@example.com", name="userexample", password="1234567890"
         )
         cls.test_author.save()
+        NoteType.get_default_category_pk()
         cls.notetype = NoteType.objects.create(category="Test Category Type One")
         cls.categorized_note = CategorizedNote.objects.create(
             note_category=cls.notetype,
@@ -141,14 +143,13 @@ class CategorizedNotesTests(APITestCase):
             format="json",
         )
         cls.token = Token.objects.get(user=cls.test_author).key
-        # cls.client.credentials(HTTP_AUTHORIZATION=f"Token {cls.token}")
 
     def test_category_note(self):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token}")
         response = self.client.get(
             reverse(
                 "categorized_notes",
-                kwargs={"category": "categorized", "category_id": 1},
+                kwargs={"category": "categorized", "category_id": self.notetype.id},
             ),
             format="json",
         )
@@ -157,7 +158,7 @@ class CategorizedNotesTests(APITestCase):
             json.loads(response.content)[0]["id"], self.categorized_note.id
         )
         self.assertEqual(
-            json.loads(response.content)[0]["note_category"],
+            json.loads(response.content)[0]["note_category"]["name"],
             self.categorized_note.note_category.category,
         )
         self.assertEqual(
@@ -177,7 +178,7 @@ class CategorizedNotesTests(APITestCase):
         response = self.client.post(
             url,
             {
-                "note_category": "Second Test Category Note",
+                "note_category": notetype.id,
                 "note_title": "Another Test Category  Note",
                 "note_body": "Just another test category note!",
             },
@@ -190,7 +191,7 @@ class CategorizedNotesTests(APITestCase):
         )
         self.assertEqual(json.loads(response.content)["id"], 2)
         self.assertEqual(
-            json.loads(response.content)["note_category"],
+            json.loads(response.content)["note_category"]["name"],
             "Second Test Category Note",
         )
         self.assertEqual(
@@ -207,7 +208,7 @@ class CategorizedNotesTests(APITestCase):
         response = self.client.put(
             url,
             {
-                "note_category": self.notetype.category,
+                "note_category": self.notetype.id,
                 "note_title": "First Test Category Note (updated)",
                 "note_body": "First userexample test categorized note updated",
             },
@@ -220,7 +221,7 @@ class CategorizedNotesTests(APITestCase):
         )
         self.assertEqual(json.loads(response.content)["id"], 1)
         self.assertEqual(
-            json.loads(response.content)["note_category"],
+            json.loads(response.content)["note_category"]["name"],
             "Test Category Type One",
         )
         self.assertEqual(

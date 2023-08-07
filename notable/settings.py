@@ -28,7 +28,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
 ALLOWED_HOSTS = [env.str("HOSTNAME1"), "127.0.0.1"]
 
@@ -68,7 +68,7 @@ ROOT_URLCONF = "notable.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -159,3 +159,11 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 TOKEN_EXPIRY_DELAY = 24 * 60 * 60
+
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL")
+EMAIL_BACKEND = env.str("EMAIL_BACKEND_DEVELOPMENT")
+EMAIL_HOST = env.str("EMAIL_HOST", default=None)
+EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default=None)
+EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default=None)
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

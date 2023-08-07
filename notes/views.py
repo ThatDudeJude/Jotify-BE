@@ -109,8 +109,7 @@ def notes_list(request, category=None, category_id=None):
         )
 
     if request.method == "GET":
-        if not category:
-            print(f"category: {category}")
+        if not category:        
             serializer = AuthorNotesSerializer(author)
             return Response(serializer.data, status=status.HTTP_200_OK)
         elif category == "quick":
@@ -123,8 +122,7 @@ def notes_list(request, category=None, category_id=None):
                 note_type = NoteType.objects.get(id=category_id)
                 categorized_notes = author.author_notes_categorizednote.filter(
                     note_category=note_type, note_author=author
-                )
-                print(categorized_notes)
+                )                
                 serializer = CategorizedNotesSerializer(categorized_notes, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except ObjectDoesNotExist:
@@ -164,8 +162,7 @@ def create_note(request):
         # To remove after building ui as id will be provided by default in the request
 
         data = json.dumps(request.data)
-        data = json.loads(data)
-        print("category:", data["note_category"])
+        data = json.loads(data)        
         serializer = CategorizedNotesSerializer(data=data, context={"request": request})
         serializer_is_set = True
     if serializer_is_set:
@@ -205,10 +202,8 @@ def quick_note_detail(request, pk=None):
 
     elif request.method == "PUT":
         data = json.dumps(request.data)
-        data = json.loads(data)
-        # category = NoteType.objects.get(category=data["note_category"])
-        # data["note_category"] = category.id
-        if not data["note_category"] == 1:
+        data = json.loads(data)        
+        if not int(data["note_category"]) == 1:
             serializer = CategorizedNotesSerializer(
                 data=data, context={"request": request}
             )
@@ -218,7 +213,7 @@ def quick_note_detail(request, pk=None):
             )
         if serializer.is_valid():
             serializer.save()
-            if not note.note_category.id == data["note_category"]:
+            if not note.note_category.id == int(data["note_category"]):
                 note.delete()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -256,11 +251,11 @@ def categorized_note_detail(request, pk):
     elif request.method == "PUT":
         data = json.dumps(request.data)
         data = json.loads(data)
-        if data["note_category"] == 1:
+        if int(data["note_category"]) == 1:
             serializer = QuickNotesSerializer(
                 data=request.data, context={"request": request}
             )
-        elif not note.note_category.id == data["note_category"]:
+        elif not note.note_category.id == int(data["note_category"]):
             serializer = CategorizedNotesSerializer(
                 data=data, context={"request": request}
             )
@@ -270,7 +265,7 @@ def categorized_note_detail(request, pk):
             )
         if serializer.is_valid():
             serializer.save()
-            if not note.note_category.id == data["note_category"]:
+            if not note.note_category.id == int(data["note_category"]):
                 note.delete()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

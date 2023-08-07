@@ -12,7 +12,6 @@ class TaskAdmin(admin.ModelAdmin):
         "task_scheduler",
         "short_description",
         "due_date",
-        # "due_time",
     ]
     list_filter = ("task_scheduler", "task_priority")
 

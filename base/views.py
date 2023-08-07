@@ -1,7 +1,12 @@
+from django.conf import settings
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.contrib.auth import authenticate, logout
 from django.db import IntegrityError
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.contrib.auth.forms import PasswordResetForm
 from rest_framework.authtoken.models import Token
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import api_view, permission_classes
@@ -42,7 +47,6 @@ def login_user(request):
         )
     else:
         token = get_token_on_login(user)
-        print({"token": str(token)})
         return JsonResponse({"token": str(token), "name": user.name}, status=201)
 
 
@@ -52,4 +56,66 @@ def logout_user(request):
     token = Token.objects.get(user=request.user)
     token.delete()
     logout(request)
-    return JsonResponse({"message": "User logged out successfully!"})
+    return JsonResponse({"message": "User logged out successfully!"}, status=200)
+
+
+token_generator = PasswordResetTokenGenerator()
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def reset_password(request):
+    request_data = request.data
+    form = PasswordResetForm(data=request_data)
+
+    if form.is_valid():
+        try:
+            user = CustomUser.objects.get(email=request_data["email"])
+        except CustomUser.DoesNotExist:
+            return JsonResponse({"error": "User account email not found!"}, status=406)
+        else:
+            uid = urlsafe_base64_encode(force_bytes(user.id))
+            token = token_generator.make_token(user)
+            opts = {
+                "use_https": request.is_secure(),
+                "request": request,
+                "from_email": "gachjude@gmail.com",
+                "subject_template_name": "accounts/password_reset_subject.txt",
+                "email_template_name": "accounts/password_reset_email.html",
+                "extra_email_context": {
+                    "site_name": "Jotify",
+                    "domain": "localhost:3000",
+                    "protocol": "http",
+                    "uid": uid,
+                    "token": token,
+                },
+            }
+            form.save(**opts)
+            return JsonResponse(
+                {
+                    "message": "Check your email for password reset link",
+                },
+                status=202,
+            )
+    return JsonResponse({"error": "Invalid form value(s)."}, status=400)
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def confirm_password_reset(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64)
+        user = CustomUser.objects.get(pk=int(uid))
+    except (CustomUser.DoesNotExist, TypeError, ValueError, OverflowError):
+        user = None
+    else:
+        if token_generator.check_token(user, token) and user is not None:
+            request_data = JSONParser().parse(request)
+            user.set_password(request_data["new_password"])
+            user.save()
+            logout(request)
+            return JsonResponse(
+                {"message": "Your new password has been set."}, status=202
+            )
+        else:
+            return JsonResponse({"message": "Bad Request!"}, status=406)
