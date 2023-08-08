@@ -97,7 +97,6 @@ class QuickNotesTests(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
         url = reverse("quick_note_fetch", kwargs={"pk": "1"})
         response = self.client.get(
             url,

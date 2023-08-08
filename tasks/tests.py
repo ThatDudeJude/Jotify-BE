@@ -21,7 +21,7 @@ class TaskTests(APITestCase):
         cls.task_scheduler.save()
         cls.task = Task(
             task_scheduler=cls.task_scheduler,
-            short_description="This is a task built for testing",
+            short_description="This is a task for testing",
             task_description=" This task is just meant for testing.",
             due_date=datetime.date(2023, 4, 13).isoformat(),
             due_time=datetime.time(20, 00).isoformat(),

@@ -18,7 +18,7 @@ class Task(models.Model):
         on_delete=models.CASCADE,
     )
     short_description = models.CharField(
-        blank=False, null=False, max_length=25, name="short_description"
+        blank=False, null=False, max_length=30, name="short_description"
     )
     desciption_note = models.TextField(
         blank=False, null=False, max_length=200, name="task_description"
