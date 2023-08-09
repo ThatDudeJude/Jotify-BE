@@ -19,7 +19,7 @@ gunicorn==20.1.0
 idna==3.4 
 inflection==0.5.1 
 jsonschema==4.4.0 
-marshmallow==4.17.0 
+marshmallow
 oauthlib==3.2.2 
 psycopg2-binary==2.9.3 
 pycparser==2.21 
