@@ -1,6 +1,6 @@
 # Jotify-Backend
 
-The backend application for Jotify, an online utility app for saving notes and to-do lists.
+The backend application for Jotify, a simple online productivity app for saving notes and to-do lists.
 
 ## Project Description
 
