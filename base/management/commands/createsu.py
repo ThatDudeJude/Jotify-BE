@@ -15,6 +15,7 @@ class Command(BaseCommand):
                 name="that-dude-jude",
                 email=env.str("SU_EMAIL"),
                 password=env.str("SU_PASSWORD"),
+                is_staff=True,
             )
 
         print("Superuser has been created!")
