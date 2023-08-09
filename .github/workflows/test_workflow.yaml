@@ -6,6 +6,17 @@ env:
   SECRET_KEY: ${{secrets.SECRET_KEY}}
   DEFAULT_FROM_EMAIL: ${{secrets.DEFAULT_FROM_EMAIL}}
   EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
+  HOSTNAME1: ${{secrets.HOSTNAME1}}
+  EMAIL_BACKEND_DEVELOPMENT: ${{secrets.EMAIL_BACKEND_DEVELOPMENT}}
+  EMAIL_BACKEND_PRODUCTION: ${{secrets.EMAIL_BACKEND_PRODUCTION}}
+  EMAIL_HOST: ${{secrets.EMAIL_HOST}}
+  EMAIL_HOST_CONSOLE: ${{secrets.EMAIL_HOST_CONSOLE}}
+  EMAIL_HOST_USER: ${{secrets.EMAIL_HOST_USER}}
+  LOCALHOST: ${{secrets.LOCALHOST}}
+  NETWORKHOST: ${{secrets.NETWORKHOST}}
+  SU_EMAIL: ${{secrets.SU_EMAIL}}
+  SU_PASSWORD: ${{secrets.SU_PASSWORD}}
+  DEBUG: False
 
 jobs:
   unit_tests:
