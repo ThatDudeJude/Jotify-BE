@@ -14,6 +14,7 @@ env:
   EMAIL_HOST_USER: ${{secrets.EMAIL_HOST_USER}}
   LOCALHOST: ${{secrets.LOCALHOST}}
   NETWORKHOST: ${{secrets.NETWORKHOST}}
+  BACKENDHOST: ${{secrets.BACKENDHOST}}
   SU_EMAIL: ${{secrets.SU_EMAIL}}
   SU_PASSWORD: ${{secrets.SU_PASSWORD}}
   DEBUG: False
