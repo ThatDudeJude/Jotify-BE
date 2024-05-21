@@ -91,7 +91,6 @@ Want to contribute? See contributing guidelines [here](/CONTRIBUTING.md).
 
 ## Codebeat
 
-[![codebeat badge](https://codebeat.co/badges/f49762c5-7506-446a-b738-fe7f9fb8bc28)](https://codebeat.co/a/thatdudejude/projects/github-com-thatdudejude-bibliophiliac-profile_branch_final)
-
+[![codebeat badge](https://codebeat.co/badges/04631858-5c13-457d-9e0a-000f97fd66b6)](https://codebeat.co/projects/github-com-thatdudejude-jotify-be-v1_final_touches)
 ## License
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENCE.txt)
